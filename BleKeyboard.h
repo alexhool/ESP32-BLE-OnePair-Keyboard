@@ -1,5 +1,5 @@
 // uncomment the following line to use NimBLE library
-//#define USE_NIMBLE
+#define USE_NIMBLE
 
 #ifndef ESP32_BLE_KEYBOARD_H
 #define ESP32_BLE_KEYBOARD_H
@@ -131,6 +131,7 @@ typedef struct
 class BleKeyboard : public Print, public BLEServerCallbacks, public BLECharacteristicCallbacks
 {
 private:
+  ble_gap_conn_desc* desc;
   BLEHIDDevice* hid;
   BLECharacteristic* inputKeyboard;
   BLECharacteristic* outputKeyboard;
@@ -174,7 +175,7 @@ public:
 protected:
   virtual void onStarted(BLEServer *pServer) { };
   virtual void onConnect(BLEServer* pServer) override;
-  virtual void onDisconnect(BLEServer* pServer) override;
+  virtual void onDisconnect(BLEServer* pServer, ble_gap_conn_desc* desc) override;
   virtual void onWrite(BLECharacteristic* me) override;
 
 };

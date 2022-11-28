@@ -1,6 +1,7 @@
 #include "BleKeyboard.h"
 
 #if defined(USE_NIMBLE)
+#include <NimBLEConnInfo.h>
 #include <NimBLEDevice.h>
 #include <NimBLEServer.h>
 #include <NimBLEUtils.h>
@@ -510,10 +511,11 @@ void BleKeyboard::onConnect(BLEServer* pServer) {
   desc->setNotifications(true);
 
 #endif // !USE_NIMBLE
-
+  advertising->setScanFilter("true", "false");
 }
 
-void BleKeyboard::onDisconnect(BLEServer* pServer) {
+void BleKeyboard::onDisconnect(BLEServer* pServer, ble_gap_conn_desc* desc) {
+  NimBLEDevice::whiteListAdd(NimBLEAddress(desc->peer_ota_addr));
   this->connected = false;
 
 #if !defined(USE_NIMBLE)
@@ -526,6 +528,7 @@ void BleKeyboard::onDisconnect(BLEServer* pServer) {
   advertising->start();
 
 #endif // !USE_NIMBLE
+  advertising->setScanFilter("true", "true");
 }
 
 void BleKeyboard::onWrite(BLECharacteristic* me) {
