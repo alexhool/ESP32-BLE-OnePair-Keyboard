@@ -1,8 +1,8 @@
 #include <NimBLEDevice.h>
-#include <BleKeyboard.h>
+#include <BleOneKeyboard.h>
 #include <ESP32Servo.h>
 
-BleKeyboard bleEsp("!Lock", "IcyHool", 100);
+BleOneKeyboard bleEsp("!Lock", "IcyHool", 100);
 Servo servo;
 
 const int ledPin = 2;
