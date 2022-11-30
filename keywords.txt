@@ -1,10 +1,10 @@
 #######################################
-# Syntax Coloring Map For ESP32 BLE Keyboard
+# Syntax Coloring Map For ESP32 BLE One Keyboard
 #######################################
 # Class
 #######################################
 
-BleKeyboard	KEYWORD1
+BleOneKeyboard	KEYWORD1
 
 #######################################
 # Methods and Functions

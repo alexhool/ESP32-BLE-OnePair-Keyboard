@@ -1,8 +1,8 @@
 // uncomment the following line to use NimBLE library
 #define USE_NIMBLE
 
-#ifndef ESP32_BLE_KEYBOARD_H
-#define ESP32_BLE_KEYBOARD_H
+#ifndef ESP32_BLE_ONE_KEYBOARD_H
+#define ESP32_BLE_ONE_KEYBOARD_H
 #include "sdkconfig.h"
 #if defined(CONFIG_BT_ENABLED)
 
@@ -128,7 +128,7 @@ typedef struct
   uint8_t keys[6];
 } KeyReport;
 
-class BleKeyboard : public Print, public BLEServerCallbacks, public BLECharacteristicCallbacks
+class BleOneKeyboard : public Print, public BLEServerCallbacks, public BLECharacteristicCallbacks
 {
 private:
   ble_gap_conn_desc* desc;
@@ -151,7 +151,7 @@ private:
   uint16_t version   = 0x0210;
 
 public:
-  BleKeyboard(std::string deviceName = "ESP32 Keyboard", std::string deviceManufacturer = "Espressif", uint8_t batteryLevel = 100);
+  BleOneKeyboard(std::string deviceName = "ESP32 One Keyboard", std::string deviceManufacturer = "Espressif", uint8_t batteryLevel = 100);
   void begin(void);
   void end(void);
   void sendReport(KeyReport* keys);
@@ -181,4 +181,4 @@ protected:
 };
 
 #endif // CONFIG_BT_ENABLED
-#endif // ESP32_BLE_KEYBOARD_H
+#endif // ESP32_BLE_ONE_KEYBOARD_H

@@ -1,4 +1,4 @@
-#include "BleKeyboard.h"
+#include "BleOneKeyboard.h"
 
 #if defined(USE_NIMBLE)
 #include <NimBLEConnInfo.h>
@@ -96,13 +96,13 @@ static const uint8_t _hidReportDescriptor[] = {
   END_COLLECTION(0)                  // END_COLLECTION
 };
 
-BleKeyboard::BleKeyboard(std::string deviceName, std::string deviceManufacturer, uint8_t batteryLevel) 
+BleOneKeyboard::BleOneKeyboard(std::string deviceName, std::string deviceManufacturer, uint8_t batteryLevel) 
     : hid(0)
     , deviceName(std::string(deviceName).substr(0, 15))
     , deviceManufacturer(std::string(deviceManufacturer).substr(0,15))
     , batteryLevel(batteryLevel) {}
 
-void BleKeyboard::begin(void)
+void BleOneKeyboard::begin(void)
 {
   BLEDevice::init(deviceName);
   BLEServer* pServer = BLEDevice::createServer();
@@ -147,22 +147,22 @@ void BleKeyboard::begin(void)
   ESP_LOGD(LOG_TAG, "Advertising started!");
 }
 
-void BleKeyboard::end(void)
+void BleOneKeyboard::end(void)
 {
 }
 
-bool BleKeyboard::isConnected(void) {
+bool BleOneKeyboard::isConnected(void) {
   return this->connected;
 }
 
-void BleKeyboard::setBatteryLevel(uint8_t level) {
+void BleOneKeyboard::setBatteryLevel(uint8_t level) {
   this->batteryLevel = level;
   if (hid != 0)
     this->hid->setBatteryLevel(this->batteryLevel);
 }
 
 //must be called before begin in order to set the name
-void BleKeyboard::setName(std::string deviceName) {
+void BleOneKeyboard::setName(std::string deviceName) {
   this->deviceName = deviceName;
 }
 
@@ -171,23 +171,23 @@ void BleKeyboard::setName(std::string deviceName) {
  * 
  * @param ms Time in milliseconds
  */
-void BleKeyboard::setDelay(uint32_t ms) {
+void BleOneKeyboard::setDelay(uint32_t ms) {
   this->_delay_ms = ms;
 }
 
-void BleKeyboard::set_vendor_id(uint16_t vid) { 
+void BleOneKeyboard::set_vendor_id(uint16_t vid) { 
 	this->vid = vid; 
 }
 
-void BleKeyboard::set_product_id(uint16_t pid) { 
+void BleOneKeyboard::set_product_id(uint16_t pid) { 
 	this->pid = pid; 
 }
 
-void BleKeyboard::set_version(uint16_t version) { 
+void BleOneKeyboard::set_version(uint16_t version) { 
 	this->version = version; 
 }
 
-void BleKeyboard::sendReport(KeyReport* keys)
+void BleOneKeyboard::sendReport(KeyReport* keys)
 {
   if (this->isConnected())
   {
@@ -200,7 +200,7 @@ void BleKeyboard::sendReport(KeyReport* keys)
   }	
 }
 
-void BleKeyboard::sendReport(MediaKeyReport* keys)
+void BleOneKeyboard::sendReport(MediaKeyReport* keys)
 {
   if (this->isConnected())
   {
@@ -357,7 +357,7 @@ uint8_t USBPutChar(uint8_t c);
 // to the persistent key report and sends the report.  Because of the way
 // USB HID works, the host acts like the key remains pressed until we
 // call release(), releaseAll(), or otherwise clear the report and resend.
-size_t BleKeyboard::press(uint8_t k)
+size_t BleOneKeyboard::press(uint8_t k)
 {
 	uint8_t i;
 	if (k >= 136) {			// it's a non-printing key (not a modifier)
@@ -398,7 +398,7 @@ size_t BleKeyboard::press(uint8_t k)
 	return 1;
 }
 
-size_t BleKeyboard::press(const MediaKeyReport k)
+size_t BleOneKeyboard::press(const MediaKeyReport k)
 {
     uint16_t k_16 = k[1] | (k[0] << 8);
     uint16_t mediaKeyReport_16 = _mediaKeyReport[1] | (_mediaKeyReport[0] << 8);
@@ -414,7 +414,7 @@ size_t BleKeyboard::press(const MediaKeyReport k)
 // release() takes the specified key out of the persistent key report and
 // sends the report.  This tells the OS the key is no longer pressed and that
 // it shouldn't be repeated any more.
-size_t BleKeyboard::release(uint8_t k)
+size_t BleOneKeyboard::release(uint8_t k)
 {
 	uint8_t i;
 	if (k >= 136) {			// it's a non-printing key (not a modifier)
@@ -445,7 +445,7 @@ size_t BleKeyboard::release(uint8_t k)
 	return 1;
 }
 
-size_t BleKeyboard::release(const MediaKeyReport k)
+size_t BleOneKeyboard::release(const MediaKeyReport k)
 {
     uint16_t k_16 = k[1] | (k[0] << 8);
     uint16_t mediaKeyReport_16 = _mediaKeyReport[1] | (_mediaKeyReport[0] << 8);
@@ -457,7 +457,7 @@ size_t BleKeyboard::release(const MediaKeyReport k)
 	return 1;
 }
 
-void BleKeyboard::releaseAll(void)
+void BleOneKeyboard::releaseAll(void)
 {
 	_keyReport.keys[0] = 0;
 	_keyReport.keys[1] = 0;
@@ -471,21 +471,21 @@ void BleKeyboard::releaseAll(void)
 	sendReport(&_keyReport);
 }
 
-size_t BleKeyboard::write(uint8_t c)
+size_t BleOneKeyboard::write(uint8_t c)
 {
 	uint8_t p = press(c);  // Keydown
 	release(c);            // Keyup
 	return p;              // just return the result of press() since release() almost always returns 1
 }
 
-size_t BleKeyboard::write(const MediaKeyReport c)
+size_t BleOneKeyboard::write(const MediaKeyReport c)
 {
 	uint16_t p = press(c);  // Keydown
 	release(c);            // Keyup
 	return p;              // just return the result of press() since release() almost always returns 1
 }
 
-size_t BleKeyboard::write(const uint8_t *buffer, size_t size) {
+size_t BleOneKeyboard::write(const uint8_t *buffer, size_t size) {
 	size_t n = 0;
 	while (size--) {
 		if (*buffer != '\r') {
@@ -500,7 +500,7 @@ size_t BleKeyboard::write(const uint8_t *buffer, size_t size) {
 	return n;
 }
 
-void BleKeyboard::onConnect(BLEServer* pServer) {
+void BleOneKeyboard::onConnect(BLEServer* pServer) {
   this->connected = true;
 
 #if !defined(USE_NIMBLE)
@@ -514,7 +514,7 @@ void BleKeyboard::onConnect(BLEServer* pServer) {
   advertising->setScanFilter("true", "false");
 }
 
-void BleKeyboard::onDisconnect(BLEServer* pServer, ble_gap_conn_desc* desc) {
+void BleOneKeyboard::onDisconnect(BLEServer* pServer, ble_gap_conn_desc* desc) {
   NimBLEDevice::whiteListAdd(NimBLEAddress(desc->peer_ota_addr));
   this->connected = false;
 
@@ -531,13 +531,13 @@ void BleKeyboard::onDisconnect(BLEServer* pServer, ble_gap_conn_desc* desc) {
   advertising->setScanFilter("true", "true");
 }
 
-void BleKeyboard::onWrite(BLECharacteristic* me) {
+void BleOneKeyboard::onWrite(BLECharacteristic* me) {
   uint8_t* value = (uint8_t*)(me->getValue().c_str());
   (void)value;
   ESP_LOGI(LOG_TAG, "special keys: %d", *value);
 }
 
-void BleKeyboard::delay_ms(uint64_t ms) {
+void BleOneKeyboard::delay_ms(uint64_t ms) {
   uint64_t m = esp_timer_get_time();
   if(ms){
     uint64_t e = (m + (ms * 1000));
